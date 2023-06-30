@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Regsys.API.Interfaces;
 using Regsys.API.Models;
 using Regsys.API.Services;
-using Regsys.API.Services;
 
-[Route("api/[controller]")]
+[Route("api/companies")]
 [ApiController]
 public class CompaniesController : ControllerBase
 {
@@ -14,13 +14,15 @@ public class CompaniesController : ControllerBase
         _companyService = companyService;
     }
 
+    // Get all companies
     [HttpGet]
-    public IActionResult GetAll()
+    public IActionResult Get()
     {
         var companies = _companyService.GetAllCompanies();
         return Ok(companies);
     }
 
+    // Get a specific company
     [HttpGet("{id}")]
     public IActionResult Get(int id)
     {
@@ -31,20 +33,28 @@ public class CompaniesController : ControllerBase
         return Ok(company);
     }
 
+    // Create a new company
     [HttpPost]
-    public IActionResult Create(Company company)
+    public IActionResult Post(Company company)
     {
         _companyService.AddCompany(company);
-        return Ok(company);
+        return CreatedAtAction(nameof(Get), new { id = company.CompanyId }, company);
     }
 
+    // Update an existing company
     [HttpPut("{id}")]
-    public IActionResult Update(int id, Company company)
+    public IActionResult Put(int id, Company company)
     {
+        if (id != company.CompanyId)
+        {
+            return BadRequest();
+        }
+
         _companyService.UpdateCompany(id, company);
         return NoContent();
     }
 
+    // Delete a company
     [HttpDelete("{id}")]
     public IActionResult Delete(int id)
     {
@@ -52,3 +62,4 @@ public class CompaniesController : ControllerBase
         return NoContent();
     }
 }
+
